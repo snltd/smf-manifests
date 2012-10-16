@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<service_bundle type='manifest' name='export'>
+  <service name='snltd/tomcat' type='service' version='0'>
+    <create_default_instance enabled='true'/>
+    <single_instance/>
+    <dependency name='filesystem' grouping='require_all' restart_on='none' type='service'>
+      <service_fmri value='svc:/system/filesystem/local'/>
+    </dependency>
+    <dependency name='network' grouping='require_all' restart_on='none' type='service'>
+      <service_fmri value='svc:/network/initial'/>
+    </dependency>
+    <exec_method name='start' type='method' exec='/usr/local/tomcat/bin/startup.sh' timeout_seconds='30'>
+      <method_context>
+        <method_credential user='www' group='www'/>
+        <method_environment>
+          <envvar name='JAVA_HOME' value='/usr/java'/>
+          <envvar name='CATALINA_HOME' value='/usr/local/tomcat'/>
+          <envvar name='CATALINA_BASE' value='/usr/local/tomcat'/>
+        </method_environment>
+      </method_context>
+    </exec_method>
+    <exec_method name='stop' type='method' exec='/usr/local/tomcat/bin/shutdown.sh' timeout_seconds='60'>
+      <method_context>
+        <method_credential user='www' group='www'/>
+        <method_environment>
+          <envvar name='JAVA_HOME' value='/usr/java'/>
+          <envvar name='CATALINA_HOME' value='/usr/local/tomcat'/>
+          <envvar name='CATALINA_BASE' value='/usr/local/tomcat'/>
+        </method_environment>
+      </method_context>
+    </exec_method>
+    <stability value='Unstable'/>
+    <template>
+      <common_name>
+        <loctext xml:lang='C'>Tomcat</loctext>
+      </common_name>
+    </template>
+  </service>
+</service_bundle>

@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+
+<!--  WebCrossing manifest written by Robert Fisher, 08/2007.
+      Starts webx as the "webx" user. No root privilege is ever required.
+      /export/forum/webx must be owned by webx
+-->
+
+<service_bundle type='manifest' name='export'>
+
+	<service name='snltd/webx' type='service' version='0'>
+
+    	<create_default_instance enabled='true'/>
+
+    	<single_instance/>
+
+    	<dependency 
+			name='milestone' 
+			grouping='require_all'
+			restart_on='error'
+			type='service'>
+			<service_fmri value='svc:/milestone/multi-user-server:default'/>
+		</dependency>
+
+		<exec_method
+			name='start'
+			type='method'
+			exec='/usr/local/lib/svc/method/webx.sh start' 
+			timeout_seconds='60'>
+
+			<method_context>
+				<method_credential
+					user='webx'
+					group='webx' 
+					privileges='basic,!proc_session,!proc_info,!file_link_any,net_privaddr'/>
+			</method_context>
+
+		</exec_method>
+
+		<exec_method
+			name='stop' 
+			type='method'
+			exec='/usr/local/lib/svc/method/webx.sh stop'
+			timeout_seconds='60'>
+			<method_context/>
+		</exec_method>
+
+		<stability value='Unstable'/>
+
+		<template>
+			<common_name>
+				<loctext xml:lang='C'>WebCrossing running as a low-privileged user</loctext>
+			</common_name>
+		</template>
+
+	</service>
+
+</service_bundle>

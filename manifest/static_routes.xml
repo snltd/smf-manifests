@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<!-- static_routes.xml
+     SMF manifest to modify the routing table.
+     Rob Fisher 03/2007
+-->
+
+<service_bundle type="manifest" name="snltd:static-routes">
+
+<service name="snltd/network/routing/static-routes" type="service" version="1">
+
+        <create_default_instance enabled="false"/>
+
+        <single_instance/>
+
+                <dependency name='physical'
+                        grouping='require_all'
+                        restart_on='none'
+                        type='service'>
+                        <service_fmri value='svc:/network/physical:default'/>
+                </dependency>
+
+		<dependency name='fs-local' 
+			grouping='require_all' 
+			restart_on='none' 
+			type='service'>
+      			<service_fmri value='svc:/system/filesystem/local'/>
+    		</dependency>
+
+		<dependency name='zones' 
+			grouping='require_all' 
+			restart_on='none' 
+			type='service'>
+      			<service_fmri value='svc:/system/zones:default'/>
+    		</dependency>
+
+         <exec_method type="method" name="start" exec="/usr/local/lib/svc/method/static_routes.sh start" timeout_seconds="60"/>
+
+         <exec_method type="method" name="stop" exec="/usr/local/lib/svc/method/static_routes.sh stop" timeout_seconds="60"/>
+
+        <property_group name="startd" type="framework">
+                <propval name="duration" type="astring" value="transient"/>
+        </property_group>
+
+         <stability value="Unstable"/>
+
+         <template>
+                <common_name>
+                        <loctext xml:lang="C">Add static routes
+                        </loctext>
+                        </common_name>
+         </template>
+
+</service>
+
+</service_bundle>
+

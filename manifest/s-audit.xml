@@ -1,0 +1,158 @@
+<?xml version='1.0'?>
+
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+
+<!--
+================================================================================
+
+	s-audit.xml
+	===========
+	
+	Manifest to start s-audit at boot time
+
+	This manifest audits the machine at boot. By default it puts the
+	generated data in /var/tmp/hostname. To change that directory, or send
+	to a remote machine, alter the options/dest propert with svccfg. Look at
+	the options property_group below for more details.
+
+	When the service is enabled, s-audit.sh will wait 180 seconds before
+	performing the audit. This is to give the machine and all its
+	applications a chance to "settle down" when the service starts after a
+	reboot. You can change this value by altering the options/delay property
+	and refreshing the service. This manifest expects to find the s-audit.sh
+	executable in /usr/local/bin, but you can alter that through the
+	options/pth property.
+
+	As this is a transient service, 'svcs' will show the service as
+
+		offline*       15:21:05 svc:/application/s-audit:default
+
+	until the audit is completed. Then its state should change to 'online'.
+
+	Refreshing the service performs an audit immediately.
+
+	R Fisher 03/10
+
+================================================================================
+
+-->
+
+<service_bundle type='manifest' name='SNLTD:s-audit'>
+
+<service 
+	name='application/s-audit' 
+	type='service' 
+	version='1'>
+
+<!-- Don't want multiple versions running - there would be no point, and it
+     might cause confusion
+-->
+
+<single_instance />
+
+<property_group name='startd' type='framework'>
+
+   <stability value='Unstable' />
+
+	<propval 
+		name='duration' 
+		type='astring'
+		value='transient' />
+
+</property_group>
+
+<property_group name='options' type='application'>
+
+	<!-- 
+
+	The options property group defines default behaviour
+
+	pth		the path to the s-audit.sh script
+	delay	the number of seconds s-audith.sh waits before performing and
+			audit when the service is enabled
+	dest	how to copy the audit data. 
+			For SCP of the form '-R user@host:/path/to/dir'
+			For local/autofs of the form '-f /path/to/dir'
+
+			SMF's super-intuitive UI dictates that the way to change the
+			dest property must follow the form
+
+			# svccfg -s s-audit setprop options/dest = 'astring: ("-f" "/tmp")'
+	-->
+
+	<propval 
+		name='pth' 
+		type='astring' 
+		value='/usr/local/bin/s-audit.sh' />
+
+	<propval 
+		name='delay' 
+		type='astring' 
+		value='180' />
+
+	<propval 
+		name='dest' 
+		type='astring' 
+		value='-f /var/tmp' />
+
+</property_group>
+
+<instance name='default' enabled='false'>
+		
+	<!-- Run in multi-user mode -->
+
+	<dependency 
+		name='multi-user'
+		grouping='require_all' 
+		restart_on='none' 
+		type='service'>
+		
+		<service_fmri value='svc:/milestone/multi-user-server:default' />
+
+	</dependency>
+
+	<!-- Tell s-audit.sh to delay on service start. Also tell it where to
+	     copy the data it generates
+	-->
+
+	<exec_method 
+		name='start' 
+		type='method' 
+		timeout_seconds='0'
+		exec='%{options/pth} -p -D %{options/delay} %{options/dest} machine' />
+
+	<exec_method
+		name='stop'
+		type='method'
+		timeout_seconds='10'
+		exec=':kill' />
+
+	<!-- On a refresh, don't tell s-audit.sh to delay. Again, we  tell it
+	     where to copy the data it generates
+	-->
+
+	<exec_method 
+		name='refresh' 
+		type='method' 
+		timeout_seconds='0'
+		exec='%{options/pth} -p %{options/dest} machine' />
+
+</instance>
+
+<template>
+
+	<common_name>
+		<loctext xml:lang='C'>
+			s-audit system auditor
+		</loctext>
+	</common_name>
+
+	<documentation>
+		<doc_link name='snltd.co.uk' uri='http://snltd.co.uk/s-audit/' />
+	</documentation>
+
+</template>
+
+</service>
+
+</service_bundle>

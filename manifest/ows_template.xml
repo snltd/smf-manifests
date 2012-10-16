@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+
+<!--
+  SMF manifest to manage Oracle iPlanet/Sun Web Server instances. Just
+  change the snane value to that of the server name. Admin instances are
+  called 'admin-server'.
+  
+  start - start server
+  stop - stop server
+  restart - restart server
+  refresh - run "rotate" to rotate log files
+
+  R Fisher / SNLTD 03/2012
+	
+-->
+
+<service_bundle type='manifest' name='webserver7'>
+
+	<service name='snltd/ows-_NAME_' type='service' version='1'>
+
+		<single_instance/>
+
+    	<property_group name='options' type='application'>
+
+			<propval 
+				name='root'
+				type='astring'
+				value='/opt/oracle/webserver7'/>
+
+			<propval 
+				name='sname'
+				type='astring'
+				value='_NAME_'/>
+
+    	</property_group>
+
+		<instance name='default' enabled='false'>
+
+			<dependency
+				name='filesystem'
+				grouping='require_all'
+				restart_on='none'
+				type='service'>
+				<service_fmri value='svc:/system/filesystem/local'/>
+			</dependency>
+
+			<exec_method
+				name='start'
+				type='method'
+				exec='%{options/root}/%{options/sname}/bin/startserv'
+				timeout_seconds='300'>
+				<method_context/>
+			</exec_method>
+
+			<exec_method
+				name='stop'
+				type='method'
+				exec='%{options/root}/%{options/sname}/bin/stopserv'
+				timeout_seconds='300'>
+				<method_context/>
+			</exec_method>
+
+			<exec_method
+				name='restart'
+				type='method'
+				exec='%{options/root}/%{options/sname}/bin/restart'
+				timeout_seconds='300'>
+				<method_context/>
+			</exec_method>
+
+			<exec_method
+				name='refresh'
+				type='method'
+				exec='%{options/root}/%{options/sname}/bin/rotate'
+				timeout_seconds='300'>
+				<method_context/>
+			</exec_method>
+
+		</instance>
+
+		<template>
+			<common_name>
+				<loctext xml:lang='C'>Oracle iPlanet Web Server 7</loctext>
+			</common_name>
+		</template>
+
+	</service>
+
+</service_bundle>
