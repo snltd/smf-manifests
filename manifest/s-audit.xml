@@ -93,7 +93,7 @@
 	<propval 
 		name='dest' 
 		type='astring' 
-		value='-f /var/tmp' />
+		value='-f /net/tap/zonedata/tap-audit/data/localnet/hosts' />
 
 </property_group>
 

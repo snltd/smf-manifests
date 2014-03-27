@@ -12,12 +12,12 @@
     </dependency>
     <exec_method name='start' type='method' exec='/usr/local/lib/svc/method/mysql.server %m' timeout_seconds='60'>
       <method_context working_directory='/var/tmp'>
-        <method_credential user='mysql' group='mysql' privileges='proc_fork,proc_exec'/>
+		  <method_credential user='mysql' group='mysql' />
       </method_context>
     </exec_method>
     <exec_method name='stop' type='method' exec='/usr/local/lib/svc/method/mysql.server %m' timeout_seconds='120'>
       <method_context working_directory='/var/tmp'>
-        <method_credential user='mysql' group='mysql' privileges='proc_fork,proc_exec,proc_session'/>
+		  <method_credential user='mysql' group='mysql' />
       </method_context>
     </exec_method>
     <exec_method name='refresh' type='method' exec='/usr/local/lib/svc/method/mysql.server restart' timeout_seconds='120'>
